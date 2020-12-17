@@ -1,3 +1,9 @@
 flows:
   default:
-  - log: "hello concord"
+    - log: "hello concord"
+    - from: myForm
+    - log: "hello ${myForm.name}"
+    - log: "form submittedby ${myForm.submittedBy.displayName}"
+forms:
+  myForm:
+    - name: { label: "name", type: "string" }
