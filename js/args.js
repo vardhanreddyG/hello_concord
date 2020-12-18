@@ -1,10 +1,10 @@
 var kv = tasks.get('kv');
 
-print("checking args")
+print("checking args",new Date().toISOString().split("T")[0])
 
 kv.putString("date",new Date().toISOString().split("T")[0])
-var count = kv.getInteger('count') || 0
+var count = kv.getLong('count') || 0
 kv.putInteger("count",count);
 
 print("date is",kv.getString('date'));
-print("count",kv.getInteger('count'))
+print("count",kv.getLong('count'))
