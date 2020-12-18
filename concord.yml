@@ -1,7 +1,7 @@
 flows:
   default:
     - log: "hello concord"
-    - form: productInfo
+    - call: process_args
 forms:
   productInfo:
     - ProductName: { label: "Product Name", type: "string" }
@@ -14,3 +14,7 @@ forms:
     - DeleteFilesOrActions:
         { label: "Delete Files or Actions", type: "boolean" }
     - FileOrActionName: { label: "File or Action Name", type: "string" }
+process_args:
+  - log: "Checking args"
+  - script: ./js/args.js
+  - form: productInfo
