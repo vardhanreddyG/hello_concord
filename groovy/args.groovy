@@ -14,7 +14,7 @@ println("prevois count" + count)
 
 if(!previousDate) kv.putString("date",dateString)
 
-if(date === dateString){
+if(date == dateString){
     println("today processes");
     kv.putLong("count",count)
 }
