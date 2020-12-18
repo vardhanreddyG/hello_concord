@@ -1,3 +1,16 @@
 flows:
   default:
-  - log: "hello concord"
+    - log: "hello concord"
+    - call: productInfo
+forms:
+  productInfo:
+    - ProductName: { label: "Product Name", type: "string" }
+    - AwEnvironment:
+        {
+          label: "AirWatch Environment ",
+          type: "boolean",
+          allow: ["cert", "prod"],
+        }
+    - DeleteFilesOrActions:
+        { label: "Delete Files or Actions", type: "boolean" }
+    - FileOrActionName: { label: "File or Action Name", type: "string" }
