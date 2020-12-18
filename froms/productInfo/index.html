@@ -20,7 +20,13 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/semantic-ui/2.2.10/semantic.min.css"
     />
-    <link rel="stylesheet" href="../shared/common.css" />
+    <!-- <link rel="stylesheet" href="../shared/common.css" /> -->
+
+    <style>
+      #filesOrActionsInput {
+        display: none;
+      }
+    </style>
   </head>
   <body>
     <br />
@@ -42,7 +48,7 @@
             {{#if success}}
               <h3 id="success" class="ui header">Completed successfully.</h3>
             {{else}}
-            <form class="ui form {{#if errors}}error{{/if}}" method="post" action="{{submitUrl}}" id="productForm">
+            <form class="ui form  {{#if errors}}error{{/if}}" method="post" action="{{submitUrl}}" id="productForm">
               {{#if errors}}
                 <div class="ui error message">
                   <ul class='list'>
@@ -67,20 +73,26 @@
               </div>
               <div class="required field">
                 <label>Product Name:</label>
-                <input name="ProductName" placeholder="Enter the exact Product name.">  <!-- (3) -->
+                <input name="ProductName" placeholder="Enter the exact Product name." type="text">  <!-- (3) -->
               </div>
 
-              <div class="ui checkbox">
-                <input type="checkbox" name="DeleteFilesOrActions" id="doDeleteActions">
-                <label>Delete Files/Actions</label>
+
+              <div class="inline field">
+                <div class="ui checkbox">
+                  <input type="checkbox" name="DeleteFilesOrActions" id="doDeleteActions">
+                  <label>Delete Files or Actions</label>
+                </div>
               </div>
-              <div class="required field hidden" id="filesOrActionsInput">
+
+
+              <div class="required field" id="filesOrActionsInput">
                 <label>Files/Actions:</label>
-                <input name="FileOrActionName" placeholder="Enter the File or Action Name.">  <!-- (3) -->
+                <input name="FileOrActionName" placeholder="Enter the File or Action Name." type="text">  <!-- (3) -->
               </div>
-
-
-              <button class="ui primary button" type="submit" onclick="handleSubmit(event)">Submit</button>
+              <div>
+                <button class="ui primary button" type="submit" onclick="handleSubmit(event)">Submit</button>
+              </div>
+              <div class="ui error message"></div>
             </form>
             {{/if}}
           </script>
@@ -96,16 +108,57 @@
       }
       var source = document.getElementById("formTemplate").innerHTML;
       var template = Handlebars.compile(source);
-      var html = template(data);
+      var html = template({});
       document.getElementById("container").innerHTML = html;
       $(".ui.dropdown").dropdown();
-      $("#doDeleteActions").change(function () {
-        $("#filesOrActionsInput").toggle();
-        if (this.checked) {
-          console.log("show input to enter action name");
-        } else {
-          console.log("hide input");
-        }
+
+      var filesOrActionsInput = $("#filesOrActionsInput");
+      $("#doDeleteActions").change(function (value) {
+        filesOrActionsInput.toggle();
+      });
+
+      $(".ui.form").form({
+        inline: true,
+        fields: {
+          FileOrActionName: {
+            identifier: "FileOrActionName",
+            depends: "DeleteFilesOrActions",
+            rules: [
+              {
+                type: "empty",
+                prompt: "Please enter Files or Actions Name",
+              },
+            ],
+          },
+          ProductName: {
+            identifier: "ProductName",
+            rules: [
+              {
+                type: "empty",
+                prompt: "Please enter product name",
+              },
+            ],
+          },
+          AwEnvironment: {
+            identifier: "AwEnvironment",
+            rules: [
+              {
+                type: "empty",
+                prompt: "Please select airwatch environment",
+              },
+            ],
+          },
+          DeleteFilesOrActions: {
+            identifier: "DeleteFilesOrActions",
+            optional: true,
+            rules: [
+              {
+                type: "empty",
+                prompt: "Please select airwatch environment",
+              },
+            ],
+          },
+        },
       });
     </script>
   </body>
