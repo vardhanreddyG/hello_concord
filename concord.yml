@@ -1,7 +1,7 @@
 flows:
   default:
     - log: "hello concord"
-    - call: productInfo
+    - form: productInfo
 forms:
   productInfo:
     - ProductName: { label: "Product Name", type: "string" }
