@@ -27,7 +27,6 @@ if(storedDate && storedDate === today){
     kv.putLong(execution,'count',storedCount+1)
     if(storedCount > 2){
         print("limit reached")
-        return false;
     }
 }
 
