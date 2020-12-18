@@ -8,7 +8,6 @@ flows:
     - call: process_args
   process_args:
   - log: "Checking args"
-  - script: ./groovy/args.groovy
   - script: ./js/args.js
   - form: productInfo
 forms:
