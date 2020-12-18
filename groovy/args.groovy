@@ -4,8 +4,8 @@ def kv = tasks.get('kv')
 
 Date today = new Date()
 String dateString = today.format("dd-MM-yyy")
-String previousDate = kv.getString('date');
-long previousCount = kv.getLong('count');
+String previousDate = kv.getString(execution,'date');
+long previousCount = kv.getLong(execution,'count');
 long count = !previousCount? 0: previousCount+1
 String date = !previousDate? dateString: previousDate
 
