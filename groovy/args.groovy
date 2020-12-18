@@ -1,6 +1,7 @@
 
 def kv = tasks.get('kv')
 
+println("groovy script")
 
 Date today = new Date()
 String dateString = today.format("dd-MM-yyy")
@@ -12,14 +13,14 @@ String date = !previousDate? dateString: previousDate
 println("previous date" + date)
 println("prevois count" + count)
 
-if(!previousDate) kv.putString("date",dateString)
+if(!previousDate) kv.putString(execution,"date",dateString)
 
 if(date == dateString){
     println("today processes");
-    kv.putLong("count",count)
+    kv.putLong(execution,"count",count)
 }
 
 
 println(dateString)
-println("date is" + kv.getString('date'))
-println("count is" + kv.getLong('count'))
+println("date is" + kv.getString(execution,'date'))
+println("count is" + kv.getLong(execution,'count'))
