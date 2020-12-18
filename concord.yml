@@ -1,3 +1,7 @@
+configuration:
+  dependencies:
+  # maven URLs...
+  - mvn://org.codehaus.groovy:groovy-all:2.4.12
 flows:
   default:
     - log: "hello concord"
