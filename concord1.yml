@@ -1,0 +1,120 @@
+configuration: 
+  dependencies: 
+    - "mvn://org.codehaus.groovy:groovy-all:2.4.12" 
+    - "mvn://io.github.http-builder-ng:http-builder-ng-core:0.16.1" 
+    - "mvn://org.codehaus.groovy.modules.http-builder:http-builder:0.7.1" 
+  arguments: 
+    apiUrlCert: "https://certmobileapi.wal-mart.com" 
+    apiUrlProd: "https://mobileapi.wal-mart.com" 
+    apiUserCert: ${crypto.decryptString("PBrBMqFf82OTLh6V7A6I/zYGhENry14wexsTIocx8IM=")} 
+    apiPassCert: ${crypto.decryptString("veSBxtTqSv/hYWac15SVlQ==")} 
+    apiKeyCert: ${crypto.decryptString("v60IY8mzn9gduOVNGps4jrm9+D7CptKgi3lFgUsJrXQ=")} 
+    apiUserProd: ${crypto.decryptString("PBrBMqFf82OTLh6V7A6I/31NfK1SVSKnrVYrJA2sBCs=")} 
+    apiPassProd: ${crypto.decryptString("Lgvzh949cw2d0b8hgL28BmQMz7sAzf4H7zxLmBGGWlE=")} 
+    apiKeyProd: ${crypto.decryptString("dyMrvhJd0CE70tuQcWM7Zbm9+D7CptKgi3lFgUsJrXQ=")} 
+    wmtApiKey: ${crypto.decryptString("6SqFQwqPXsk9EXgiYnHpBcvIjM+po4EQOZnp41UGwrPvJX736VlzxamF90LAIvzC")} 
+out: 
+- deleteProductSuccess 
+- deleteAppSuccess 
+- execError 
+flows: 
+  default: 
+- log: "Start flow: default" 
+- log: "Workflow initiated by: ${initiator.username}" 
+- set: 
+  executeForm: false 
+  deleteProductSuccess: false 
+  deleteAppSuccess: false 
+  execError: false 
+  statusArray: 
+- status: { Waiting: false, Active: true, Error: false, Success: false, Name: "Validate input", Description: "" } 
+- status: { Waiting: true, Active: false, Error: false, Success: false, Name: "Delete Items", Description: "Product, Application, Smart Group, User Group" } 
+- call: process_args 
+- set: 
+statusArray[0].status.Active: false 
+statusArray[0].status.Error: ${!doDeleteProduct} 
+statusArray[0].status.Success: ${doDeleteProduct} 
+statusArray[1].status.Waiting: false 
+statusArray[1].status.Active: true 
+- call: updateProgress 
+- if: ${doDeleteProduct} 
+then: 
+- task: slack 
+in: 
+channelId: "ade-aw-deployments" 
+text: "```Workflow: ${projectInfo.projectName}\nSession ID: ${txId}\nUser: ${initiator.username}\nEnvironment: ${awEnvironment}\nDeleting '${productName}'```" 
+- call: delete_product_and_app 
+- set: 
+statusArray[1].status.Active: false 
+statusArray[1].status.Error: ${!deleteProductSuccess} 
+statusArray[1].status.Success: ${deleteProductSuccess} 
+- call: updateProgress 
+- task: slack 
+in: 
+channelId: "ade-aw-deployments" 
+text: "```Session ID: ${txId}\nDelete Product success = ${deleteProductSuccess}\nDelete App Success = ${deleteAppSuccess}\nError = ${execError}```" 
+else: 
+- log: "Not enough info to delete product and app" 
+- set: 
+statusArray[1].status.Active: false 
+statusArray[1].status.Error: true 
+statusArray[1].status.Success: false 
+- call: updateProgress 
+- call: finish 
+- log: "End flow: default" 
+# Deletes the Product and associated app 
+delete_product_and_app: 
+- log: "Start flow: delete_product_and_app" 
+- script: ./groovy/aw-delete-product-and-app.groovy 
+- log: "deleteProductSuccess: ${deleteProductSuccess}" 
+- log: " deleteAppSuccess: ${deleteAppSuccess}" 
+- log: "End flow: delete_product_and_app" 
+updateProgress: 
+- if: ${executeForm} 
+then: 
+- form: progress 
+values: 
+txId: ${txId} 
+statusArray: ${statusArray} 
+execError: ${execError} 
+finish: 
+- form: finish 
+values: 
+txId: ${txId} 
+statusArray: ${statusArray} 
+execError: ${execError} 
+# determines if enough info was provided via initializtaion or if the form 
+# needs to be invoked for user input 
+# we needs these args to exist: 
+# productName 
+# executeForm 
+# doDeleteProduct 
+# apiUrl 
+# apiUser 
+# apiPass 
+# apiKey 
+# rootGroup 
+process_args: 
+- log: "Checking for provided arguments..." 
+- script: ./js/args.js 
+- if: ${executeForm} 
+then: 
+- log: "executing form..." 
+- form: productInfo 
+values: 
+txId: ${txId} 
+- log: "Validating form input..." 
+- script: ./js/formArgs.js 
+else: 
+- log: "Product Name: ${productName}" 
+- log: "End flow: process_args" 
+forms: 
+productInfo: 
+- ProductName: { label: "Product Name", type: "string" } 
+- AwEnvironment: { label: "AirWatch Environment", type: "string", allow: ["cert", "prod"] } 
+- DeleteFilesOrActions: { label: "Delete File/Actions" , type: "boolean"} 
+- FileOrActionName: { label: "Product Name", type: "string" } 
+progress: 
+- group: { type: "string?"} 
+finish: 
+- group: { type: "string?"} 
