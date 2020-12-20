@@ -18,7 +18,9 @@ var httpConfig = {
   response: "string",
 };
 
-print(http.toString())
+print(http.asString("https://jsonplaceholder.typicode.com/posts/1"))
+
+print(execution)
 
 // check the day key exists
 
