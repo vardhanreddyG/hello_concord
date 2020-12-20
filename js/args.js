@@ -1,5 +1,6 @@
 var kv = tasks.get("kv");
 var dateTime = tasks.get("datetime");
+var http = tasks.get("http");
 
 var currentDate = dateTime.current("yyy/MM/dd");
 
@@ -11,6 +12,13 @@ print(
   ",storedDate::" + storedDate,
   ",storedCount::" + storedCount
 );
+
+var httpConfig = {
+  url: "https://jsonplaceholder.typicode.com/posts/1",
+  response: "string",
+};
+
+print(http.toString())
 
 // check the day key exists
 
